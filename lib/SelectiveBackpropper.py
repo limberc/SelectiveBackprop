@@ -14,7 +14,6 @@ start_time_seconds = time.time()
 
 
 class SelectiveBackpropper:
-
     def __init__(self,
                  model,
                  optimizer,

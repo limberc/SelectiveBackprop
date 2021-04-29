@@ -12,12 +12,9 @@ import torch.backends.cudnn as cudnn
 import torch.nn as nn
 from torch.optim.lr_scheduler import MultiStepLR
 from torchvision import transforms
-from torchvision.datasets import CIFAR10, CIFAR100, SVHN
 
-from lib.SelectiveBackpropper import SelectiveBackpropper
-from lib.cutout import Cutout
-from model.resnet import ResNet18
-from model.wide_resnet import WideResNet
+from lib import CIFAR10withIndex, CIFAR100withIndex, SVHNwithIndex, Cutout, SelectiveBackpropper
+from model import ResNet18, WideResNet
 
 start_time_seconds = time.time()
 
@@ -103,37 +100,37 @@ test_transform = transforms.Compose([
 
 if args.dataset == 'cifar10':
     num_classes = 10
-    train_dataset = CIFAR10(root="data/",
-                            train=True,
-                            transform=train_transform,
-                            download=True)
+    train_dataset = CIFAR10withIndex(root="data/",
+                                     train=True,
+                                     transform=train_transform,
+                                     download=True)
 
-    test_dataset = CIFAR10(root="data/",
-                           train=False,
-                           transform=test_transform,
-                           download=True)
+    test_dataset = CIFAR10withIndex(root="data/",
+                                    train=False,
+                                    transform=test_transform,
+                                    download=True)
 elif args.dataset == 'cifar100':
     num_classes = 100
-    train_dataset = CIFAR100(root="data/",
-                             train=True,
-                             transform=train_transform,
-                             download=True)
+    train_dataset = CIFAR100withIndex(root="data/",
+                                      train=True,
+                                      transform=train_transform,
+                                      download=True)
 
-    test_dataset = CIFAR100(root="data/",
-                            train=False,
-                            transform=test_transform,
-                            download=True)
+    test_dataset = CIFAR100withIndex(root="data/",
+                                     train=False,
+                                     transform=test_transform,
+                                     download=True)
 elif args.dataset == 'svhn':
     num_classes = 10
-    train_dataset = SVHN(root="data/",
-                         split='train',
-                         transform=train_transform,
-                         download=True)
+    train_dataset = SVHNwithIndex(root="data/",
+                                  split='train',
+                                  transform=train_transform,
+                                  download=True)
 
-    extra_dataset = SVHN(root="data/",
-                         split='extra',
-                         transform=train_transform,
-                         download=True)
+    extra_dataset = SVHNwithIndex(root="data/",
+                                  split='extra',
+                                  transform=train_transform,
+                                  download=True)
 
     # Combine both training splits (https://arxiv.org/pdf/1605.07146.pdf)
     data = np.concatenate([train_dataset.data, extra_dataset.data], axis=0)
@@ -141,10 +138,10 @@ elif args.dataset == 'svhn':
     train_dataset.data = data
     train_dataset.labels = labels
 
-    test_dataset = SVHN(root='/ssd/datasets/svhn/',
-                        split='test',
-                        transform=test_transform,
-                        download=True)
+    test_dataset = SVHNwithIndex(root='/ssd/datasets/svhn/',
+                                 split='test',
+                                 transform=test_transform,
+                                 download=True)
 
 # Data Loader (Input Pipeline)
 static_dataset = [a for a in train_dataset]
