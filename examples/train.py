@@ -20,10 +20,8 @@ sys.path.insert(0, parent_dir)
 
 from model.resnet import ResNet18
 from model.wide_resnet import WideResNet
-
+from torchvision.datasets import CIFAR10, CIFAR100, SVHN
 from lib.SelectiveBackpropper import SelectiveBackpropper
-import lib.cifar
-import lib.svhn
 from lib.cutout import Cutout
 
 start_time_seconds = time.time()
@@ -86,13 +84,6 @@ if args.cuda:
 test_id = args.dataset + '_' + args.model
 
 filename = args.output_dir + "/" + test_id + '_sb.csv'
-if args.dataset == 'cifar10' or args.dataset == 'cifar100':
-    dataset_lib = lib.cifar
-elif args.dataset == 'svhn':
-    dataset_lib = lib.svhn
-else:
-    print("{} dataset not supported with SB".format(args.dataset))
-    exit()
 
 # Image Preprocessing
 if args.dataset == 'svhn':
@@ -117,37 +108,37 @@ test_transform = transforms.Compose([
 
 if args.dataset == 'cifar10':
     num_classes = 10
-    train_dataset = dataset_lib.CIFAR10(root="data/",
-                                        train=True,
-                                        transform=train_transform,
-                                        download=True)
+    train_dataset = CIFAR10(root="data/",
+                            train=True,
+                            transform=train_transform,
+                            download=True)
 
-    test_dataset = dataset_lib.CIFAR10(root="data/",
-                                       train=False,
-                                       transform=test_transform,
-                                       download=True)
+    test_dataset = CIFAR10(root="data/",
+                           train=False,
+                           transform=test_transform,
+                           download=True)
 elif args.dataset == 'cifar100':
     num_classes = 100
-    train_dataset = dataset_lib.CIFAR100(root="data/",
-                                         train=True,
-                                         transform=train_transform,
-                                         download=True)
+    train_dataset = CIFAR100(root="data/",
+                             train=True,
+                             transform=train_transform,
+                             download=True)
 
-    test_dataset = dataset_lib.CIFAR100(root="data/",
-                                        train=False,
-                                        transform=test_transform,
-                                        download=True)
+    test_dataset = CIFAR100(root="data/",
+                            train=False,
+                            transform=test_transform,
+                            download=True)
 elif args.dataset == 'svhn':
     num_classes = 10
-    train_dataset = dataset_lib.SVHN(root="data/",
-                                     split='train',
-                                     transform=train_transform,
-                                     download=True)
+    train_dataset = SVHN(root="data/",
+                         split='train',
+                         transform=train_transform,
+                         download=True)
 
-    extra_dataset = dataset_lib.SVHN(root="data/",
-                                     split='extra',
-                                     transform=train_transform,
-                                     download=True)
+    extra_dataset = SVHN(root="data/",
+                         split='extra',
+                         transform=train_transform,
+                         download=True)
 
     # Combine both training splits (https://arxiv.org/pdf/1605.07146.pdf)
     data = np.concatenate([train_dataset.data, extra_dataset.data], axis=0)
@@ -155,10 +146,10 @@ elif args.dataset == 'svhn':
     train_dataset.data = data
     train_dataset.labels = labels
 
-    test_dataset = dataset_lib.SVHN(root='/ssd/datasets/svhn/',
-                                    split='test',
-                                    transform=test_transform,
-                                    download=True)
+    test_dataset = SVHN(root='/ssd/datasets/svhn/',
+                        split='test',
+                        transform=test_transform,
+                        download=True)
 
 # Data Loader (Input Pipeline)
 static_dataset = [a for a in train_dataset]
