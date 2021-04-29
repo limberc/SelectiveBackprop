@@ -4,21 +4,16 @@
 
 import argparse
 import os
-import pdb
 import sys
 import time
-import numpy as np
-from tqdm import tqdm
 from os.path import dirname, abspath
 
+import numpy as np
 import torch
-import torch.nn as nn
-from torch.autograd import Variable
 import torch.backends.cudnn as cudnn
+import torch.nn as nn
 from torch.optim.lr_scheduler import MultiStepLR
-
-from torchvision.utils import make_grid
-from torchvision import datasets, transforms
+from torchvision import transforms
 
 parent_dir = dirname(dirname(abspath(__file__)))
 sys.path.insert(0, parent_dir)
@@ -28,7 +23,6 @@ from model.wide_resnet import WideResNet
 
 from lib.SelectiveBackpropper import SelectiveBackpropper
 import lib.cifar
-import lib.datasets
 import lib.svhn
 from lib.cutout import Cutout
 
@@ -47,7 +41,7 @@ parser.add_argument('--model', '-a', default='resnet18',
                     choices=model_options)
 parser.add_argument('--batch_size', type=int, default=128,
                     help='input batch size for training (default: 128)')
-#parser.add_argument('--epochs', type=int, default=200,
+# parser.add_argument('--epochs', type=int, default=200,
 #                    help='number of epochs to train (default: 20)')
 parser.add_argument('--hours', type=float, default=12,
                     help='number of hours to train (default: 12)')
@@ -102,7 +96,7 @@ else:
 
 # Image Preprocessing
 if args.dataset == 'svhn':
-    normalize = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
+    normalize = transforms.Normalize(mean=[x / 255.0 for x in [109.9, 109.7, 113.8]],
                                      std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
 else:
     normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
@@ -217,8 +211,9 @@ sb = SelectiveBackpropper(cnn,
                           args.fp_selector,
                           args.staleness)
 
+
 def test_sb(loader, epoch, sb):
-    cnn.eval()    # Change model to 'eval' mode (BN uses moving mean/var).
+    cnn.eval()  # Change model to 'eval' mode (BN uses moving mean/var).
     correct = 0.
     total = 0.
     test_loss = 0.
@@ -240,17 +235,18 @@ def test_sb(loader, epoch, sb):
 
     print('============ EPOCH {} ============'.format(epoch))
     print('FPs: {} / {}\nBPs: {} / {}\nTest loss: {:.6f}\nTest acc: {:.3f} \nTime elapsed: {:.2f}s'.format(
-                sb.logger.global_num_forwards,
-                sb.logger.global_num_skipped_fp + sb.logger.global_num_forwards,
-                sb.logger.global_num_backpropped,
-                sb.logger.global_num_skipped + sb.logger.global_num_backpropped,
-                test_loss,
-                100.*val_acc,
-                time.time() - start_time_seconds))
+        sb.logger.global_num_forwards,
+        sb.logger.global_num_skipped_fp + sb.logger.global_num_forwards,
+        sb.logger.global_num_backpropped,
+        sb.logger.global_num_skipped + sb.logger.global_num_backpropped,
+        test_loss,
+        100. * val_acc,
+        time.time() - start_time_seconds))
     cnn.train()
     return 100. * val_acc
 
-stopped = False 
+
+stopped = False
 epoch = -1
 
 while (time.time() - start_time_seconds < args.hours * 3600.):
@@ -267,4 +263,3 @@ while (time.time() - start_time_seconds < args.hours * 3600.):
     sb.next_epoch()
     sb.next_partition()
     test_acc = test_sb(test_loader, epoch, sb)
-
