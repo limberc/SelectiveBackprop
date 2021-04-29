@@ -1,14 +1,17 @@
+import time
+
+import torch
+import torch.nn as nn
+
 from . import backproppers
 from . import calculators
 from . import fp_selectors
 from . import loggers
 from . import selectors
-import time
-import torch
-import torch.nn as nn
 from . import trainer as trainer
 
 start_time_seconds = time.time()
+
 
 class SelectiveBackpropper:
 
@@ -31,7 +34,7 @@ class SelectiveBackpropper:
         assert device == "cuda"
         self.num_training_images = num_training_images
         num_images_to_prime = self.num_training_images
-        #num_images_to_prime = 0
+        # num_images_to_prime = 0
 
         log_interval = 1
         sampling_min = 0
@@ -39,7 +42,7 @@ class SelectiveBackpropper:
         max_history_len = 1024
         prob_loss_fn = nn.CrossEntropyLoss
         loss_fn = nn.CrossEntropyLoss
-        sample_size = 0 # only needed for topk, lowk
+        sample_size = 0  # only needed for topk, lowk
 
         # Params for resuming from checkpoint
         start_epoch = 0
@@ -93,11 +96,11 @@ class SelectiveBackpropper:
                                                    lr_schedule=lr_sched,
                                                    forwardlr=forwardlr)
 
-        self.logger = loggers.Logger(log_interval = log_interval,
+        self.logger = loggers.Logger(log_interval=log_interval,
                                      epoch=start_epoch,
                                      num_backpropped=start_num_backpropped,
                                      num_skipped=start_num_skipped,
-                                     start_time_seconds = start_time_seconds)
+                                     start_time_seconds=start_time_seconds)
 
         self.trainer.on_backward_pass(self.logger.handle_backward_batch)
         self.trainer.on_forward_pass(self.logger.handle_forward_batch)

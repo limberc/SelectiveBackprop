@@ -1,6 +1,7 @@
+import random
 
 import torch
-import random
+
 
 def print_random_points_in_tensor_unroll1(tensor):
     print(tensor.shape)
@@ -18,6 +19,7 @@ def print_random_points_in_tensor_unroll1(tensor):
             index = random.randint(0, len(flat_t))
             output += "{0}:{1:.3f}, ".format(index, flat_t[index])
         print(output)
+
 
 def print_random_points_in_dict(d):
     seed = len(d)

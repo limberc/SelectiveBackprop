@@ -1,12 +1,12 @@
-from scipy import stats
 import collections
 import math
+
 import numpy as np
 import torch
-import torch.nn as nn
-from random import shuffle
-import lib.predictors
+
 import lib.hist
+import lib.predictors
+
 
 # TODO: Transform into base classes
 def get_probability_calculator(calculator_type,
@@ -45,13 +45,14 @@ def get_probability_calculator(calculator_type,
         exit()
     return probability_calculator
 
+
 class BatchedRandomProbabilityCalculator(object):
     def __init__(self, device, sampling_min, beta):
         self.device = device
         self.sampling_min = sampling_min
         self.beta = beta
 
-    def calculate_probability(self,):
+    def calculate_probability(self, ):
         random_percentile = np.random.uniform(0, 1)
         return math.pow(random_percentile, self.beta)
 
@@ -59,10 +60,11 @@ class BatchedRandomProbabilityCalculator(object):
         probs = [max(self.sampling_min, self.calculate_probability()) for i in range(len(examples_and_metadata))]
         return probs
 
+
 class BatchedRelativeProbabilityCalculator(object):
     def __init__(self, device, sampling_min, history_length, beta):
         self.device = device
-        self.historical_losses = lib.hist.UnboundedHistogram(history_length) #collections.deque(maxlen=history_length)
+        self.historical_losses = lib.hist.UnboundedHistogram(history_length)  # collections.deque(maxlen=history_length)
         self.sampling_min = sampling_min
         self.beta = beta
 
@@ -80,6 +82,7 @@ class BatchedRelativeProbabilityCalculator(object):
         probs = [max(self.sampling_min, self.calculate_probability(loss)) for loss in losses]
         return probs
 
+
 class BatchedSelectProbabilityCalculator(object):
     def __init__(self, sampling_min, sampling_max, num_classes, device, prob_transform=None):
         self.sampling_min = sampling_min
@@ -89,7 +92,7 @@ class BatchedSelectProbabilityCalculator(object):
         if prob_transform:
             self.prob_transform = prob_transform
         else:
-            self.prob_transform  = lambda x: x
+            self.prob_transform = lambda x: x
 
     def get_probability(self, examples_and_metadata):
         ts = [em.example.target for em in examples_and_metadata]
@@ -102,6 +105,7 @@ class BatchedSelectProbabilityCalculator(object):
         l2_dist = np.square(l2_dist)
         base = np.clip(self.prob_transform(l2_dist), self.sampling_min, self.sampling_max)
         return np.clip(base, self.sampling_min, self.sampling_max)
+
 
 class BatchedAlwaysOnProbabilityCalculator(object):
     def get_probability(self, examples_and_metadata):
@@ -127,9 +131,11 @@ class HistoricalProbabilityCalculator(object):
     def get_probability(self, example):
         return self.calculator.get_probability(example)
 
+
 class VanillaHistoricalCalculator(object):
     def get_probability(self, example):
         return 1
+
 
 class MeanHistoricalCalculator(VanillaHistoricalCalculator):
     def __init__(self):
@@ -156,7 +162,7 @@ class MeanHistoricalCalculator(VanillaHistoricalCalculator):
         if not example.get_select(True):
             return 1
         if len(hist) >= self.history_length:
-            #print(hist)
+            # print(hist)
             if all(h < 0.001 for h in hist):
                 return 0
         return 1
@@ -176,7 +182,7 @@ class ProportionalProbabiltyCalculator(object):
         if prob_transform:
             self.prob_transform = prob_transform
         else:
-            self.prob_transform  = lambda x: x
+            self.prob_transform = lambda x: x
 
     def get_probability(self, example):
         target = example.target
@@ -220,10 +226,9 @@ class GPHistoricalCalculator(VanillaHistoricalCalculator):
                     predictor.update(X, ys)
         self.xs[example.image_id] += 1
 
-
     def select(self, y, std):
         draw = np.random.uniform(0, 1)
-        if self.timeout_multiplier * (y + (self.std_multiplier*std)) > draw:
+        if self.timeout_multiplier * (y + (self.std_multiplier * std)) > draw:
             self.timeout_multiplier += 10
             return 1, draw
         else:
@@ -288,7 +293,7 @@ class RTOHistoricalCalculator(VanillaHistoricalCalculator):
 
     def select(self, y, std):
         draw = np.random.uniform(0, 1)
-        if self.timeout_multiplier * (y + (self.std_multiplier*std)) > draw:
+        if self.timeout_multiplier * (y + (self.std_multiplier * std)) > draw:
             self.timeout_multiplier += 2
             return 1, draw
         else:
@@ -303,11 +308,9 @@ class RTOHistoricalCalculator(VanillaHistoricalCalculator):
             return 1
 
         y, std = predictor.predict(None)
-        is_selected, draw =  self.select(y, std)
+        is_selected, draw = self.select(y, std)
         example.fp_draw = draw
         if is_selected == 0:
             if hasattr(example, "loss"):
                 self.bp_selector.update_history(example.loss.item())
         return is_selected
-
-

@@ -1,8 +1,9 @@
 import collections
 
+
 class BoundedHistogram:
     def __init__(self, max_history):
-        self.max_history =  max_history
+        self.max_history = max_history
         self.num_slots = 1000
         self.history = collections.deque(maxlen=self.max_history)
         self.histogram = [0] * self.num_slots
@@ -10,7 +11,7 @@ class BoundedHistogram:
 
     def append(self, value):
         if len(self.history) == self.max_history:
-            assert value <= 1 and value >= 0 
+            assert value <= 1 and value >= 0
             popped_value = self.history[0]
             slot = int(popped_value * self.num_slots) % self.num_slots
             assert self.histogram[slot] > 0
@@ -27,9 +28,10 @@ class BoundedHistogram:
         summed_count = sum(self.histogram[:slot])
         return summed_count * 100. / self.count
 
+
 class UnboundedHistogram:
     def __init__(self, max_history):
-        self.max_history =  max_history
+        self.max_history = max_history
         self.history = collections.deque(maxlen=self.max_history)
 
     def append(self, value):
@@ -46,10 +48,9 @@ class UnboundedHistogram:
         num_lower_scores = self.get_count(self.history, score)
         return num_lower_scores * 100. / len(self.history)
 
-def test():
 
+def test():
     import datetime
-    import timeit
     import random
 
     def get_epochtime_us():
@@ -75,11 +76,11 @@ def test():
     ah.append(3)
     ah.append(4)
     percentile = ah.percentile_of_score(3)
-    #print(ah.history, 3, percentile)
+    # print(ah.history, 3, percentile)
 
     ah.append(5)
     percentile = ah.percentile_of_score(3)
-    #print(ah.history, 3, percentile)
+    # print(ah.history, 3, percentile)
     num_trials = 1000000
 
     '''
@@ -105,10 +106,5 @@ def test():
     end = get_epochtime_us()
     print("{} get_percentile_of_scores, {} us".format(num_trials, float(end - start) / num_trials))
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    test()
-
-
-
-
-

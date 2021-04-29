@@ -2,22 +2,25 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision
 import torchvision.transforms as transforms
+from PIL import ImageFile
+
 import lib.cifar
 import lib.mnist
-from PIL import ImageFile
+
 
 def get_batches(iterable, n=1):
     l = len(iterable)
     batches = [iterable[ndx:min(ndx + n, l)] for ndx in range(0, l, n)]
     return batches
 
+
 def split(dataset_size, split_size):
     indices = list(range(dataset_size))
     np.random.shuffle(indices)
     strides = get_batches(indices, split_size)
     return strides
+
 
 class Dataset(object):
     # TODO: remove this first_split_size nonsense
@@ -40,9 +43,10 @@ class Dataset(object):
 
     def get_dataset_splits(self, first_split_size=None):
         split_size = self.get_split_size(first_split_size)
-        splits =  split(self.num_training_images, split_size)
+        splits = split(self.num_training_images, split_size)
         self.first_split = False
         return splits
+
 
 class CIFAR10(Dataset):
     def __init__(self, model, test_batch_size, augment, split_size, randomize_labels):
@@ -55,8 +59,8 @@ class CIFAR10(Dataset):
 
         # Testing set
         transform_test = transforms.Compose([
-                                transforms.ToTensor(),
-                                transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])
         testset = lib.cifar.CIFAR10(root='./data',
                                     train=False,
@@ -91,15 +95,15 @@ class CIFAR10(Dataset):
 
         self.num_training_images = len(self.trainset)
 
-        self.unnormalizer = transforms.Compose([transforms.Normalize(mean = [ 0., 0., 0. ],
-                                                            std = [ 1/0.2023, 1/0.1994, 1/0.2010 ]),
-                                       transforms.Normalize(mean = [ -0.4914, -0.4822, -0.4465 ],
-                                                            std = [ 1., 1., 1. ])
-                                      ])
+        self.unnormalizer = transforms.Compose([transforms.Normalize(mean=[0., 0., 0.],
+                                                                     std=[1 / 0.2023, 1 / 0.1994, 1 / 0.2010]),
+                                                transforms.Normalize(mean=[-0.4914, -0.4822, -0.4465],
+                                                                     std=[1., 1., 1.])
+                                                ])
+
 
 class MNIST(Dataset):
     def __init__(self, device, split_size, test_batch_size):
-
         super(MNIST, self).__init__(split_size)
 
         self.model = MNISTNet().to(device)
@@ -109,25 +113,26 @@ class MNIST(Dataset):
         # Testing set
         self.testloader = torch.utils.data.DataLoader(
             lib.mnist.MNIST('../data', train=False, download=True,
-                           transform=transforms.Compose([
-                           transforms.ToTensor(),
-                           transforms.Normalize((0.1307,), (0.3081,))
-                       ])),
+                            transform=transforms.Compose([
+                                transforms.ToTensor(),
+                                transforms.Normalize((0.1307,), (0.3081,))
+                            ])),
             batch_size=test_batch_size, shuffle=False, num_workers=2)
 
         # Training set
         self.trainset = lib.mnist.MNIST('../data', train=True, download=True,
-                       transform=transforms.Compose([
-                           transforms.ToTensor(),
-                           transforms.Normalize((0.1307,), (0.3081,))
-                       ]))
-        self.unnormalizer = transforms.Compose([transforms.Normalize(mean = [ 0., 0., 0. ],
-                                                            std = [ 1/0.3081]),
-                                       transforms.Normalize(mean = [ -0.1307],
-                                                            std = [ 1., 1., 1. ])
-                                      ])
+                                        transform=transforms.Compose([
+                                            transforms.ToTensor(),
+                                            transforms.Normalize((0.1307,), (0.3081,))
+                                        ]))
+        self.unnormalizer = transforms.Compose([transforms.Normalize(mean=[0., 0., 0.],
+                                                                     std=[1 / 0.3081]),
+                                                transforms.Normalize(mean=[-0.1307],
+                                                                     std=[1., 1., 1.])
+                                                ])
 
         self.num_training_images = len(self.trainset)
+
 
 class MNISTNet(nn.Module):
     def __init__(self):
@@ -147,12 +152,16 @@ class MNISTNet(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
+
 from torch.utils.data import ConcatDataset
 from torchvision import datasets
+
+
 class IndexedSVHN(datasets.SVHN):
     def __getitem__(self, index):
         retval = super(IndexedSVHN, self).__getitem__(index)
         return retval + (index,)
+
 
 class SVHN(Dataset):
     def __init__(self, model, test_batch_size, split_size, augment):
@@ -204,20 +213,21 @@ class SVHN(Dataset):
 
         self.num_training_images = len(self.trainset)
 
-        self.unnormalizer = transforms.Compose([transforms.Normalize(mean = [ 0., 0., 0. ],
-                                                            std = [ 1/0.2023, 1/0.1994, 1/0.2010 ]),
-                                       transforms.Normalize(mean = [ -0.4914, -0.4822, -0.4465 ],
-                                                            std = [ 1., 1., 1. ])
-                                      ])
+        self.unnormalizer = transforms.Compose([transforms.Normalize(mean=[0., 0., 0.],
+                                                                     std=[1 / 0.2023, 1 / 0.1994, 1 / 0.2010]),
+                                                transforms.Normalize(mean=[-0.4914, -0.4822, -0.4465],
+                                                                     std=[1., 1., 1.])
+                                                ])
+
 
 class IndexedImageFolder(datasets.ImageFolder):
     def __getitem__(self, index):
         retval = super(IndexedImageFolder, self).__getitem__(index)
         return retval + (index,)
 
+
 class ImageNet(Dataset):
     def __init__(self, model, test_batch_size, traindir, valdir, split_size):
-
         super(ImageNet, self).__init__(split_size)
 
         ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -227,13 +237,12 @@ class ImageNet(Dataset):
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                          std=[0.229, 0.224, 0.225])
 
-
         # Testing set
         testset = IndexedImageFolder(valdir, transforms.Compose([
-                                            transforms.Resize(256),
-                                            transforms.CenterCrop(224),
-                                            transforms.ToTensor(),
-                                            normalize]))
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            normalize]))
         self.testloader = torch.utils.data.DataLoader(testset,
                                                       batch_size=test_batch_size,
                                                       shuffle=False,
@@ -251,8 +260,8 @@ class ImageNet(Dataset):
                                            transform_train)
         self.num_training_images = len(self.trainset)
         print(self.num_training_images)
-        self.unnormalizer = transforms.Compose([transforms.Normalize(mean = [ 0., 0., 0. ],
-                                                        std = [ 1/0.229, 1/0.224, 1/0.225 ]),
-                                                transforms.Normalize(mean = [ -0.485, -0.456, -0.406 ],
-                                                        std = [ 1., 1., 1. ])
-                                               ])
+        self.unnormalizer = transforms.Compose([transforms.Normalize(mean=[0., 0., 0.],
+                                                                     std=[1 / 0.229, 1 / 0.224, 1 / 0.225]),
+                                                transforms.Normalize(mean=[-0.485, -0.456, -0.406],
+                                                                     std=[1., 1., 1.])
+                                                ])

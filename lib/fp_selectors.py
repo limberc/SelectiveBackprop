@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # TODO: Transform into base classes
 def get_selector(selector_type, num_images_to_prime, staleness=2):
     if selector_type == "threshold":
@@ -15,6 +16,7 @@ def get_selector(selector_type, num_images_to_prime, staleness=2):
                               final_selector,
                               num_images_to_prime)
     return selector
+
 
 class PrimedSelector(object):
     def __init__(self, initial, final, initial_num_images, epoch=0):
@@ -43,13 +45,14 @@ class AlwaysOnSelector():
             em.example.forward_select = True
         return examples_and_metadata
 
+
 class StaleSelector():
     def __init__(self, threshold):
         self.threshold = threshold
         self.logger = {"counter": 0, "forward": 0, "no_forward": 0}
 
     def select(self, em):
-        #if self.logger['counter'] % 50000 == 0:
+        # if self.logger['counter'] % 50000 == 0:
         #    print(self.logger)
         self.logger['counter'] += 1
 
@@ -63,9 +66,10 @@ class StaleSelector():
             return False
 
     def mark(self, examples_and_metadata):
-        for em in examples_and_metadata: 
+        for em in examples_and_metadata:
             em.example.forward_select = self.select(em)
         return examples_and_metadata
+
 
 '''
 class ThresholdSelector():

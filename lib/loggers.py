@@ -1,12 +1,9 @@
-import numpy as np
-import pickle
 import os
+import pickle
 import time
-import torch
-import torch.nn as nn
+
+import numpy as np
 import torchvision
-import torchvision.transforms as transforms
-from PIL import Image
 
 
 class ImageWriter(object):
@@ -58,9 +55,9 @@ class ProbabilityByImageLogger(object):
         self.probabilities_pickle_file = os.path.join(data_pickle_dir,
                                                       "{}_probabilities".format(self.pickle_prefix))
         self.backward_selects_pickle_file = os.path.join(data_pickle_dir,
-                                                "{}_selects".format(self.pickle_prefix))
+                                                         "{}_selects".format(self.pickle_prefix))
         self.forward_selects_pickle_file = os.path.join(data_pickle_dir,
-                                                "{}_forwardselects".format(self.pickle_prefix))
+                                                        "{}_forwardselects".format(self.pickle_prefix))
         self.losses_pickle_file = os.path.join(data_pickle_dir,
                                                "{}_losses".format(self.pickle_prefix))
         # Make images hist pickle path
@@ -142,7 +139,7 @@ class ImageIdHistLogger(object):
         self.data = dict(zip(keys, [0] * len(keys)))
         data_pickle_dir = os.path.join(self.pickle_dir, "image_id_hist")
         self.data_pickle_file = os.path.join(data_pickle_dir,
-                                                 "{}_images_hist".format(self.pickle_prefix))
+                                             "{}_images_hist".format(self.pickle_prefix))
         # Make images hist pickle path
         if not os.path.exists(data_pickle_dir):
             os.mkdir(data_pickle_dir)
@@ -188,7 +185,7 @@ class LossesByEpochLogger(object):
         self.data = []
         data_pickle_dir = os.path.join(self.pickle_dir, "losses")
         self.data_pickle_file = os.path.join(data_pickle_dir,
-                                                 "{}_losses".format(self.pickle_prefix))
+                                             "{}_losses".format(self.pickle_prefix))
         # Make images hist pickle path
         if not os.path.exists(data_pickle_dir):
             os.mkdir(data_pickle_dir)
@@ -293,6 +290,7 @@ class VariancesByImageLogger(object):
             print(latest_file)
             pickle.dump(variance, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+
 class VariancesByEpochLogger(object):
     def __init__(self, pickle_dir, pickle_prefix, log_frequency):
         self.current_epoch = 0
@@ -311,7 +309,7 @@ class VariancesByEpochLogger(object):
         self.data = []
         data_pickle_dir = os.path.join(self.pickle_dir, "variance_by_epoch")
         self.data_pickle_file = os.path.join(data_pickle_dir,
-                                                 "{}_variances".format(self.pickle_prefix))
+                                             "{}_variances".format(self.pickle_prefix))
         # Make images hist pickle path
         if not os.path.exists(data_pickle_dir):
             os.mkdir(data_pickle_dir)
@@ -331,6 +329,7 @@ class VariancesByEpochLogger(object):
             with open(epoch_file, "wb") as handle:
                 print(epoch_file)
                 pickle.dump(self.data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 class VariancesByAverageProbabilityByImageLogger(object):
     def __init__(self, pickle_dir, pickle_prefix, max_num_images=None):
@@ -380,9 +379,11 @@ class VariancesByAverageProbabilityByImageLogger(object):
             print(latest_file)
             pickle.dump(out, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+
 class Logger(object):
 
-    def __init__(self, log_interval=1, epoch=0, num_backpropped=0, num_skipped=0, num_skipped_fp=0, num_forwards=0, start_time_seconds=None):
+    def __init__(self, log_interval=1, epoch=0, num_backpropped=0, num_skipped=0, num_skipped_fp=0, num_forwards=0,
+                 start_time_seconds=None):
         self.current_epoch = epoch
         self.current_batch = 0
         self.log_interval = log_interval
@@ -390,7 +391,7 @@ class Logger(object):
         self.global_num_backpropped = num_backpropped
         self.global_num_skipped = num_skipped
         self.global_num_skipped_fp = num_skipped_fp
-        self.global_num_forwards= num_forwards
+        self.global_num_forwards = num_forwards
 
         self.partition_loss = 0
         self.partition_backpropped_loss = 0
@@ -473,5 +474,3 @@ class Logger(object):
     def write(self):
         if self.current_batch % self.log_interval == 0:
             print(self.train_debug)
-
-

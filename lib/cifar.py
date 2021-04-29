@@ -1,10 +1,13 @@
 from __future__ import print_function
-from PIL import Image
+
 import os
 import os.path
-import numpy as np
-from random import shuffle
 import sys
+from random import shuffle
+
+import numpy as np
+from PIL import Image
+
 if sys.version_info[0] == 2:
     import cPickle as pickle
 else:

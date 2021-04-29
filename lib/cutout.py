@@ -9,8 +9,8 @@ section 3 to be specific to the needs of the education communities using this
 license.
 """
 
-import torch
 import numpy as np
+import torch
 
 
 class Cutout(object):
@@ -20,6 +20,7 @@ class Cutout(object):
         n_holes (int): Number of patches to cut out of each image.
         length (int): The length (in pixels) of each square patch.
     """
+
     def __init__(self, n_holes, length):
         self.n_holes = n_holes
         self.length = length

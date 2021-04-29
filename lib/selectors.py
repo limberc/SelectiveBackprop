@@ -1,10 +1,9 @@
-from scipy import stats
-import collections
-import math
+import numpy as np
+from random import shuffle
+
 import numpy as np
 import torch
-import torch.nn as nn
-from random import shuffle
+
 
 # TODO: Transform into base classes
 def get_selector(selector_type, probability_calculator, num_images_to_prime, sample_size):
@@ -113,12 +112,14 @@ class SamplingSelector(object):
             em.example.select = self.select(em.example)
         return forward_pass_batch
 
+
 class AlwaysOnSelector(SamplingSelector):
     def __init__(self, probability_calculator):
         super(AlwaysOnSelector, self).__init__(probability_calculator)
 
     def select(self, example):
         return True
+
 
 class BaselineSelector(object):
 
@@ -130,5 +131,3 @@ class BaselineSelector(object):
             em.example.select_probability = torch.tensor([[1]]).item()
             em.example.select = self.select(em.example)
         return forward_pass_batch
-
-

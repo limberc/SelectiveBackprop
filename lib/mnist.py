@@ -1,12 +1,15 @@
 from __future__ import print_function
-import torch.utils.data as data
-from PIL import Image
+
+import codecs
+import gzip
 import os
 import os.path
-import gzip
+
 import numpy as np
 import torch
-import codecs
+import torch.utils.data as data
+from PIL import Image
+
 from .utils import download_url, makedir_exist_ok
 
 
@@ -93,7 +96,7 @@ class MNIST(data.Dataset):
 
     def _check_exists(self):
         return os.path.exists(os.path.join(self.processed_folder, self.training_file)) and \
-            os.path.exists(os.path.join(self.processed_folder, self.test_file))
+               os.path.exists(os.path.join(self.processed_folder, self.test_file))
 
     @staticmethod
     def extract_gzip(gzip_path, remove_finished=False):

@@ -1,6 +1,6 @@
-
 import torch
 import torch.nn as nn
+
 
 class CutoutForwardpropper(object):
 
@@ -50,13 +50,13 @@ class CutoutForwardpropper(object):
             for em, loss, is_correct in zip(selected_examples,
                                             losses,
                                             is_corrects):
-
                 em.example.loss = loss.item()
                 em.example.correct = is_correct.item()
                 em.metadata["epochs_since_update"] = 0
                 em.metadata["loss"] = em.example.loss
 
         return batch
+
 
 class BaselineForwardpropper(object):
 
@@ -87,10 +87,10 @@ class BaselineForwardpropper(object):
         for obj in gc.get_objects():
             try:
                 if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
-                    #print(type(obj), obj.size())
+                    # print(type(obj), obj.size())
                     count += 1
             except:
-                pass 
+                pass
         return count
 
     def forward_pass(self, batch):
