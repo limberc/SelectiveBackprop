@@ -4,9 +4,7 @@
 
 import argparse
 import os
-import sys
 import time
-from os.path import dirname, abspath
 
 import numpy as np
 import torch
@@ -14,15 +12,12 @@ import torch.backends.cudnn as cudnn
 import torch.nn as nn
 from torch.optim.lr_scheduler import MultiStepLR
 from torchvision import transforms
-
-parent_dir = dirname(dirname(abspath(__file__)))
-sys.path.insert(0, parent_dir)
-
-from model.resnet import ResNet18
-from model.wide_resnet import WideResNet
 from torchvision.datasets import CIFAR10, CIFAR100, SVHN
+
 from lib.SelectiveBackpropper import SelectiveBackpropper
 from lib.cutout import Cutout
+from model.resnet import ResNet18
+from model.wide_resnet import WideResNet
 
 start_time_seconds = time.time()
 
