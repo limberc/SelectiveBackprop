@@ -10,7 +10,7 @@ class CIFAR10withIndex(CIFAR10):
 
 class CIFAR100withIndex(CIFAR100):
     def __getitem__(self, index):
-        img, target = super(CIFAR10withIndex, self).__getitem__(index)
+        img, target = super(CIFAR100withIndex, self).__getitem__(index)
         return img, target, index
 
 
