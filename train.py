@@ -28,17 +28,17 @@ calculator_options = ['relative', 'random', 'hybrid']
 fp_selector_options = ['alwayson', 'stale']
 
 parser = argparse.ArgumentParser(description='CNN')
-parser.add_argument('--dataset', '-d', default='cifar10',
+parser.add_argument('--dataset', '-d', default='cifar100',
                     choices=dataset_options)
 parser.add_argument('--model', '-a', default='resnet18',
                     choices=model_options)
-parser.add_argument('--batch_size', type=int, default=128,
+parser.add_argument('--batch_size', type=int, default=256,
                     help='input batch size for training (default: 128)')
 # parser.add_argument('--epochs', type=int, default=200,
 #                    help='number of epochs to train (default: 20)')
 parser.add_argument('--hours', type=float, default=12,
                     help='number of hours to train (default: 12)')
-parser.add_argument('--learning_rate', type=float, default=0.1,
+parser.add_argument('--learning_rate', type=float, default=0.2,
                     help='learning rate')
 parser.add_argument('--data_augmentation', action='store_true', default=False,
                     help='augment data by flipping and cropping')
