@@ -11,7 +11,6 @@ import lib.predictors
 # TODO: Transform into base classes
 def get_probability_calculator(calculator_type,
                                device,
-                               prob_loss_fn,
                                sampling_min,
                                sampling_max,
                                num_classes,

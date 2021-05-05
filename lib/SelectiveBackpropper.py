@@ -39,7 +39,6 @@ class SelectiveBackpropper:
         sampling_min = 0
         sampling_max = 1
         max_history_len = 1024
-        prob_loss_fn = nn.CrossEntropyLoss
         loss_fn = nn.CrossEntropyLoss
         sample_size = 0  # only needed for topk, lowk
 
