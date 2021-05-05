@@ -3,8 +3,7 @@ from sklearn import gaussian_process
 from sklearn.gaussian_process.kernels import Matern, WhiteKernel, ConstantKernel
 
 
-class Predictor():
-
+class Predictor:
     def update(self):
         raise NotImplementedError
 
@@ -15,7 +14,6 @@ class Predictor():
 class GPPredictor(Predictor):
 
     def __init__(self):
-        # super(GPPredictor, self).__init__()
         self.kernel = ConstantKernel() + Matern(length_scale=2, nu=3 / 2) + WhiteKernel(noise_level=1)
         self.gp = gaussian_process.GaussianProcessRegressor(kernel=self.kernel)
 

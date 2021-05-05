@@ -76,14 +76,12 @@ class SelectiveBackpropper:
                                                    num_images_to_prime,
                                                    sample_size)
 
-            self.fp_selector = fp_selectors.get_selector(fp_selector_type,
-                                                         num_images_to_prime,
-                                                         staleness=staleness)
+            self.fp_selector = fp_selectors.PrimedSelector(fp_selector_type,
+                                                           num_images_to_prime,
+                                                           staleness=staleness)
 
-            self.backpropper = backproppers.SamplingBackpropper(device,
-                                                                model,
-                                                                optimizer,
-                                                                loss_fn)
+            self.backpropper = backproppers.SamplingBackpropper(device, model,
+                                                                optimizer, loss_fn)
 
             self.trainer = trainer.MemoizedTrainer(device,
                                                    model,
