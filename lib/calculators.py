@@ -96,7 +96,7 @@ class BatchedSelectProbabilityCalculator(object):
 
     def get_probability(self, examples_and_metadata):
         ts = [em.example.target for em in examples_and_metadata]
-        ss = [em.example.softmax_output for e in examples_and_metadata]
+        ss = [em.example.softmax_output for em in examples_and_metadata]
         targets = torch.stack(ts, dim=0).cpu().numpy()
         softmax_outputs = torch.stack(ss, dim=0).cpu().numpy()
         classes = np.diag(np.arange(self.num_classes))
