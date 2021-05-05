@@ -71,14 +71,14 @@ class SelectiveBackpropper:
                                                                             num_classes,
                                                                             max_history_len,
                                                                             prob_pow)
-            self.selector = selectors.get_selector("sampling",
-                                                   probability_calculator,
-                                                   num_images_to_prime,
-                                                   sample_size)
+            self.selector = selectors.PrimedSelector("sampling",
+                                                     probability_calculator,
+                                                     num_images_to_prime,
+                                                     sample_size)
 
-            self.fp_selector = fp_selectors.PrimedSelector(fp_selector_type,
-                                                           num_images_to_prime,
-                                                           staleness=staleness)
+            self.fp_selector = fp_selectors.PrimedFPSelector(fp_selector_type,
+                                                             num_images_to_prime,
+                                                             staleness=staleness)
 
             self.backpropper = backproppers.SamplingBackpropper(device, model,
                                                                 optimizer, loss_fn)
