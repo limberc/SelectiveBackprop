@@ -1,16 +1,11 @@
-import numpy as np
-
-
 # TODO: Transform into base classes
 def get_selector(selector_type, num_images_to_prime, staleness=2):
-    if selector_type == "threshold":
-        final_selector = ThresholdSelector()
-    elif selector_type == "alwayson":
+    if selector_type == "alwayson":
         final_selector = AlwaysOnSelector()
     elif selector_type == "stale":
         final_selector = StaleSelector(staleness)
     else:
-        print("FP Selector must be in {alwayson, threshold}")
+        print("FP Selector must be in {alwayson, stale}")
         exit()
     selector = PrimedSelector(AlwaysOnSelector(),
                               final_selector,
@@ -38,7 +33,7 @@ class PrimedSelector(object):
         return self.get_selector().mark(*args, **kwargs)
 
 
-class AlwaysOnSelector():
+class AlwaysOnSelector:
     def mark(self, examples_and_metadata):
         for em in examples_and_metadata:
             em.example.forward_select_probability = 1.
@@ -46,7 +41,7 @@ class AlwaysOnSelector():
         return examples_and_metadata
 
 
-class StaleSelector():
+class StaleSelector:
     def __init__(self, threshold):
         self.threshold = threshold
         self.logger = {"counter": 0, "forward": 0, "no_forward": 0}
