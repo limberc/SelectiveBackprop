@@ -21,7 +21,8 @@ def get_probability_calculator(calculator_type,
         prob_transform = lambda x: torch.pow(x, prob_pow)
     else:
         prob_transform = None
-
+    assert calculator_type in ['vanilla', 'alwayson', 'relative',
+                               'random'], "Use prob-strategy in {vanilla,alwayson,relative,random}"
     if calculator_type == "vanilla":
         probability_calculator = BatchedSelectProbabilityCalculator(sampling_min,
                                                                     sampling_max,
@@ -39,9 +40,6 @@ def get_probability_calculator(calculator_type,
         probability_calculator = BatchedRandomProbabilityCalculator(device,
                                                                     sampling_min,
                                                                     prob_pow)
-    else:
-        print("Use prob-strategy in {vanilla,alwayson,relative,random}")
-        exit()
     return probability_calculator
 
 
