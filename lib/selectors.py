@@ -1,34 +1,7 @@
-import numpy as np
 from random import shuffle
 
 import numpy as np
 import torch
-
-
-# TODO: Transform into base classes
-def get_selector(selector_type, probability_calculator, num_images_to_prime, sample_size):
-    if selector_type == "sampling":
-        final_selector = SamplingSelector(probability_calculator)
-    elif selector_type == "alwayson":
-        final_selector = AlwaysOnSelector(probability_calculator)
-    elif selector_type == "baseline":
-        final_selector = BaselineSelector()
-    elif selector_type == "topk":
-        final_selector = TopKSelector(probability_calculator,
-                                      sample_size)
-    elif selector_type == "lowk":
-        final_selector = LowKSelector(probability_calculator,
-                                      sample_size)
-    elif selector_type == "randomk":
-        final_selector = RandomKSelector(probability_calculator,
-                                         sample_size)
-    else:
-        print("Use sb-strategy in {sampling, deterministic, baseline, topk, lowk, randomk}")
-        exit()
-    selector = PrimedSelector(BaselineSelector(),
-                              final_selector,
-                              num_images_to_prime)
-    return selector
 
 
 class PrimedSelector(object):
@@ -51,7 +24,7 @@ class PrimedSelector(object):
         return self.get_selector().mark(*args, **kwargs)
 
 
-class TopKSelector(object):
+class TopKSelector:
     def __init__(self, probability_calculator, sample_size):
         self.get_select_probability = probability_calculator.get_probability
         self.sample_size = sample_size
