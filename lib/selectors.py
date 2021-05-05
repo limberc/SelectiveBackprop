@@ -5,9 +5,26 @@ import torch
 
 
 class PrimedSelector(object):
-    def __init__(self, initial, final, initial_num_images, epoch=0):
-        self.initial = initial
-        self.final = final
+    def __init__(self, selector_type, probability_calculator, initial_num_images, sample_size, epoch=0):
+        self.initial = BaselineSelector()
+        assert selector_type in ['sampling', 'alwayson', 'baseline', 'topk', 'lowk',
+                                 'randomk'], "Use sb-strategy in {sampling, deterministic, baseline, topk, lowk, randomk}"
+        if selector_type == "sampling":
+            final_selector = SamplingSelector(probability_calculator)
+        elif selector_type == "alwayson":
+            final_selector = AlwaysOnSelector(probability_calculator)
+        elif selector_type == "baseline":
+            final_selector = BaselineSelector()
+        elif selector_type == "topk":
+            final_selector = TopKSelector(probability_calculator,
+                                          sample_size)
+        elif selector_type == "lowk":
+            final_selector = LowKSelector(probability_calculator,
+                                          sample_size)
+        elif selector_type == "randomk":
+            final_selector = RandomKSelector(probability_calculator,
+                                             sample_size)
+        self.final = final_selector
         self.initial_num_images = initial_num_images
         self.num_trained = 0
 
